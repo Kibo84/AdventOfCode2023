@@ -18,8 +18,6 @@ fun main() {
 
 fun extractCharArrayNumericValue(charArray: CharArray): Int {
     val numbersList: List<Char> = charArray.filter(Char::isDigit).toList()
-    val firstNumber = numbersList.first()
-    val lastNumber = numbersList.last()
 
-    return "$firstNumber$lastNumber".toInt()
+    return "${ numbersList.first() }${ numbersList.last() }".toInt()
 }
