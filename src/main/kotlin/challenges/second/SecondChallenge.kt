@@ -1,9 +1,10 @@
 package challenges.second
 
-import challenges.first.extractCharArrayNumericValue
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
+
+val listStringNumbers: List<String> = listOf("one", "two", "three", "four", "five", "six", "seven", "eight", "nine")
 
 fun main() {
     val file = File("src/inputs/input.txt")
@@ -19,43 +20,38 @@ fun main() {
 }
 
 fun replaceNumbersInOrder(string: String): String {
-    val listStringNumbers: List<String> = listOf("one", "two", "three", "four", "five", "six", "seven", "eight", "nine")
-    val nonExistingRange: Int = -1
+    val nonExistingIndex: Int = -1
     val mapFirstNumbers: MutableMap<String, Int> = mutableMapOf()
 
     listStringNumbers.forEach {
-        mapFirstNumbers[it] = nonExistingRange
+        mapFirstNumbers[it] = nonExistingIndex
     }
 
     val mapLastNumbers: MutableMap<String, Int> = mapFirstNumbers.toMutableMap()
 
-    mapFirstNumbers.entries.forEach { entre ->
-        val index = Regex(entre.key).findAll(string).map { it.range.first }.firstOrNull()
-        mapFirstNumbers[entre.key] = index ?: nonExistingRange
+    mapFirstNumbers.entries.forEach { entry ->
+        val index = Regex(entry.key).findAll(string).map { it.range.first }.firstOrNull()
+        mapFirstNumbers[entry.key] = index ?: nonExistingIndex
     }
 
-    mapLastNumbers.entries.forEach { entre ->
-        val index = Regex(entre.key).findAll(string).map { it.range.first }.lastOrNull()
-        mapLastNumbers[entre.key] = index ?: -1
+    mapLastNumbers.entries.forEach { entry ->
+        val index = Regex(entry.key).findAll(string).map { it.range.first }.lastOrNull()
+        mapLastNumbers[entry.key] = index ?: nonExistingIndex
     }
 
-    val firstNumber = mapFirstNumbers.filter { entre -> entre.value != nonExistingRange }.minByOrNull { it.value }?.key
-    val lastNumber = mapLastNumbers.filter { entre -> entre.value != nonExistingRange }.maxByOrNull { it.value }?.key
+    val firstNumber = mapFirstNumbers.filter { entry -> entry.value != nonExistingIndex }.minByOrNull { it.value }?.key
+    val lastNumber = mapLastNumbers.filter { entry -> entry.value != nonExistingIndex }.maxByOrNull { it.value }?.key
 
     return replaceWrittenNumbersToDigits(string, firstNumber, lastNumber)
 }
 
 fun replaceWrittenNumbersToDigits(string: String, firstReplace: String?, lastReplace: String?): String {
     val mapNumbers: MutableMap<String, String> = mutableMapOf()
-    mapNumbers["one"] = "1"
-    mapNumbers["two"] = "2"
-    mapNumbers["three"] = "3"
-    mapNumbers["four"] = "4"
-    mapNumbers["five"] = "5"
-    mapNumbers["six"] = "6"
-    mapNumbers["seven"] = "7"
-    mapNumbers["eight"] = "8"
-    mapNumbers["nine"] = "9"
+    val indexAdjustment = 1
+
+    listStringNumbers.forEachIndexed { index, stringNumber ->
+        mapNumbers[stringNumber] = "${index + indexAdjustment}"
+    }
 
     var result: String = string
 
