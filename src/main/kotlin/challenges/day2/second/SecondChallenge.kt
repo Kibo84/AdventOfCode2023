@@ -48,7 +48,7 @@ data class Game(
             var blue = 0
 
             rounds.forEach { round ->
-                round.red?. let { if (it > red) red = it }
+                round.red?.let { if (it > red) red = it }
                 round.green?.let { if (it > green) green = it }
                 round.blue?.let { if (round.blue > blue) blue = round.blue }
             }
