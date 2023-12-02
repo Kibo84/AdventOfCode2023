@@ -1,4 +1,4 @@
-package challenges.fourth
+package challenges.day2.second
 
 import java.io.BufferedReader
 import java.io.File
@@ -8,7 +8,7 @@ fun main() {
     val file = File("src/inputs/input-day-2.txt")
     val result = BufferedReader(InputStreamReader(file.inputStream())).use { fileReader ->
         fileReader.readLines()
-            .map(Game::fromString)
+            .map(Game.Companion::fromString)
             .map(Game::power)
             .sum()
     }
@@ -30,7 +30,7 @@ data class Game(
 
             val gameStringList = writtenGame.split(": ")
             val number = gameStringList[gameIndex].split(" ")[gameNumberIndex].toInt()
-            val rounds = gameStringList[roundsIndex].split("; ").map(Round::fromString)
+            val rounds = gameStringList[roundsIndex].split("; ").map(Round.Companion::fromString)
             val minBagConfiguration = calculateMinBagConfiguration(rounds)
             val power = calculatePower(minBagConfiguration)
 
