@@ -5,7 +5,7 @@ import java.io.File
 import java.io.InputStreamReader
 
 fun main() {
-    val file = File("src/inputs/input.txt")
+    val file = File("src/inputs/input-day-1.txt")
     val result = BufferedReader(InputStreamReader(file.inputStream())).use { fileReader ->
         fileReader.readLines()
             .map(String::toCharArray)

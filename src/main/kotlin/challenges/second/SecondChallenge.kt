@@ -7,7 +7,7 @@ import java.io.InputStreamReader
 val listStringNumbers: List<String> = listOf("one", "two", "three", "four", "five", "six", "seven", "eight", "nine")
 
 fun main() {
-    val file = File("src/inputs/input.txt")
+    val file = File("src/inputs/input-day-1.txt")
     val result = BufferedReader(InputStreamReader(file.inputStream())).use { fileReader ->
         fileReader.readLines()
             .map(::replaceWrittenNumbersToDigits)
