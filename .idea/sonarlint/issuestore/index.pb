@@ -13,3 +13,7 @@ J
 src/inputs/input-day-4.txt,5\9\5986e4f4136db40730a3c61e396374d728eee0f5
 g
 7src/main/kotlin/challenges/day4/first/FirstChallenge.kt,0\6\0686533c92a5b107dbcddc60922b31aafc720d32
+i
+9src/main/kotlin/challenges/day4/second/SecondChallenge.kt,1\1\112deeeab2ef3f6f3dffa55b2f117cd3aade0511
+L
+src/inputs/input-pruebas.txt,6\0\60d64eccaeabbdead0f59606e73c41bd0217fb5a
