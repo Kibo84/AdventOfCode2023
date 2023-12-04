@@ -1,13 +1,15 @@
 
-G
-src/main/kotlin/Main.kt,d\8\d83ae3847b7d408136086cc5e9e95f5f7c126ed5
 D
 src/inputs/input.txt,e\d\ed4dfb00eefc7ff1b4cad0f818a9f09f8ead181e
-Q
-!src/main/kotlin/FirstChallenge.kt,4\f\4f4aee9b559f4a7cb6bb78acfd2ff7d87a79dbd7
-R
-"src/main/kotlin/SecondChallenge.kt,4\8\487e8cdd4fddb3c9ed63ece750f710257ca40cfd
 b
 2src/main/kotlin/challenges/first/FirstChallenge.kt,2\c\2cffca952645861ff90a08b8aa16ed28b5d0317b
 d
 4src/main/kotlin/challenges/second/SecondChallenge.kt,d\9\d9ccdac016dac674bd2a1e0d617c26b73a41c216
+g
+7src/main/kotlin/challenges/day1/first/FirstChallenge.kt,5\7\57396e97e537225fd85c38c95341ac06b5d68856
+i
+9src/main/kotlin/challenges/day1/second/SecondChallenge.kt,1\8\1822c7d27319485a71b0a22b5610586555d5fe12
+J
+src/inputs/input-day-4.txt,5\9\5986e4f4136db40730a3c61e396374d728eee0f5
+g
+7src/main/kotlin/challenges/day4/first/FirstChallenge.kt,0\6\0686533c92a5b107dbcddc60922b31aafc720d32
