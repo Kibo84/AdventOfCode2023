@@ -53,8 +53,9 @@ fun calculateWinnings(index: Int, bid: Long) = (index + indexAdjustment) * bid
 data class Hand(val cards: String, var type: HandsType = HandsType.HIGH_CARD, val bid: Long) : Comparable<Hand> {
 
     fun calculateTypeOfHand(): Hand {
+        val joker = 'J'
         valueOfCardsMap.keys.forEach { cardSymbol ->
-            val tempHand = this.copy(cards = this.cards.replace('J', cardSymbol))
+            val tempHand = this.copy(cards = this.cards.replace(joker, cardSymbol))
 
             val possibleType = calculateType(tempHand)
             if (possibleType.value > type.value) type = possibleType

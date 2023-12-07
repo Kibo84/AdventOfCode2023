@@ -9,8 +9,6 @@ g
 7src/main/kotlin/challenges/day4/first/FirstChallenge.kt,0\6\0686533c92a5b107dbcddc60922b31aafc720d32
 i
 9src/main/kotlin/challenges/day4/second/SecondChallenge.kt,1\1\112deeeab2ef3f6f3dffa55b2f117cd3aade0511
-L
-src/inputs/input-pruebas.txt,6\0\60d64eccaeabbdead0f59606e73c41bd0217fb5a
 i
 9src/main/kotlin/challenges/day3/second/SecondChallenge.kt,7\f\7fae551f73ccbcb202b9c5029c4cbfa737718bd9
 :
@@ -30,3 +28,9 @@ J
 src/inputs/input-day-7.txt,c\a\caa2812d805ce2cafe21daae383ea0c12a22325e
 L
 src/inputs/input-testing.txt,f\8\f87f927a7e0e2a9ee92afce04692c5c358aa0c98
+i
+9src/main/kotlin/challenges/day6/second/SecondChallenge.kt,8\d\8d257179f8f67c9293b5e14e26d63ba57ae43c67
+J
+src/inputs/input-day-6.txt,2\0\205a9e8eb6eb814bf30a9ff55a312cbc78d50d70
+J
+src/inputs/input-day-1.txt,c\d\cd013e883be0802397b2504268544013339f3d1f
