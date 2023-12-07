@@ -54,7 +54,7 @@ data class Hand(val cards: String, var type: HandsType = HandsType.HIGH_CARD, va
 
     fun calculateTypeOfHand(): Hand {
         val joker = 'J'
-        valueOfCardsMap.keys.forEach { cardSymbol ->
+        this.cards.forEach { cardSymbol ->
             val tempHand = this.copy(cards = this.cards.replace(joker, cardSymbol))
 
             val possibleType = calculateType(tempHand)
@@ -65,23 +65,26 @@ data class Hand(val cards: String, var type: HandsType = HandsType.HIGH_CARD, va
     }
 
     override fun compareTo(other: Hand): Int {
+        val thisMajor = 1
+        val otherMajor = -1
+        val equals = 0
         val valueTypeOfThis = this.type.value
         val valueTypeOfOther = other.type.value
 
-        if (valueTypeOfThis > valueTypeOfOther) return 1
-        if (valueTypeOfThis < valueTypeOfOther) return -1
+        if (valueTypeOfThis > valueTypeOfOther) return thisMajor
+        if (valueTypeOfThis < valueTypeOfOther) return otherMajor
 
         this.cards.forEachIndexed { index, card ->
             val valueOfThisCard = valueOfCardsMap[card]
             val valueOfOtherCard = valueOfCardsMap[other.cards[index]]
 
             if (valueOfThisCard != null && valueOfOtherCard != null) {
-                if (valueOfThisCard > valueOfOtherCard) return 1
-                if (valueOfThisCard < valueOfOtherCard) return -1
+                if (valueOfThisCard > valueOfOtherCard) return thisMajor
+                if (valueOfThisCard < valueOfOtherCard) return otherMajor
             }
         }
 
-        return 0
+        return equals
     }
 
     companion object {
@@ -91,8 +94,7 @@ data class Hand(val cards: String, var type: HandsType = HandsType.HIGH_CARD, va
             val delimiter = " "
 
             val writtenHand = line.split(delimiter)
-            val cards = writtenHand[cardsIndex]
-            return Hand(cards = cards, bid = writtenHand[bidIndex].toLong())
+            return Hand(cards = writtenHand[cardsIndex], bid = writtenHand[bidIndex].toLong())
         }
 
         fun calculateType(hand: Hand): HandsType {
@@ -101,7 +103,7 @@ data class Hand(val cards: String, var type: HandsType = HandsType.HIGH_CARD, va
             var setOfThree = 0
             var setOfTwo = 0
 
-            valueOfCardsMap.keys.forEach { cardSymbol ->
+            valueOfCardsMap.keys.filter{ it in hand.cards }.forEach { cardSymbol ->
                 val repeats = hand.cards.count { card -> card == cardSymbol }
                 if (repeats == 5) setOfFive++
                 if (repeats == 4) setOfFour++
