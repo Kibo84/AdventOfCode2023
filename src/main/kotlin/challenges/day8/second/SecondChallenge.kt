@@ -35,18 +35,18 @@ fun calculateAllRoutesSteps(instructions: String, originNodeList: List<Node>, no
 
 fun calculateRoutSteps(instructions: String, node: Node, nodeMap: Map<String, Node>): Long {
     val indexAdjustment = 1
-    var result = 0L
+    var routeSteps = 0L
     var repeat = 0
     var tempNode = node.copy()
-    while (result.isZero()) {
+    while (routeSteps.isZero()) {
         instructions.forEachIndexed { index, instruction ->
             tempNode = searchNextNode(tempNode, instruction, nodeMap)
-            if (Node.arriveToDestiny(tempNode)) result = (index + indexAdjustment).toLong()
+            if (Node.arriveToDestiny(tempNode)) routeSteps = (index + indexAdjustment).toLong()
         }
-        if (!result.isZero()) result += (instructions.length * repeat)
+        if (!routeSteps.isZero()) routeSteps += (instructions.length * repeat)
         repeat++
     }
-    return result
+    return routeSteps
 }
 
 fun searchNextNode(node: Node, instruction: Char, nodeMap: Map<String, Node>): Node {
