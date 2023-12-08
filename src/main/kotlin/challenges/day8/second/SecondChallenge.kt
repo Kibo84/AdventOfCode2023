@@ -4,14 +4,9 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
 
-val regexInstructions = Regex("^[LR]*$")
-val nodeMap: MutableMap<String, Node> = mutableMapOf()
-const val leftInstruction = 'L'
-const val indexAdjustment = 1
-const val destiny = 'Z'
-const val origin = 'A'
-
 fun main() {
+    val regexInstructions = Regex("^[LR]*$")
+    val nodeMap: MutableMap<String, Node> = mutableMapOf()
     var instructions = ""
     val file = File("src/inputs/input-day-8.txt")
     val lines = BufferedReader(InputStreamReader(file.inputStream())).use { fileReader ->
@@ -27,23 +22,25 @@ fun main() {
             nodeMap[node.nodeName] = node
         }
     }
-    val nodeRoutes = nodeMap.values.filter(Node::isOrigin)
-    val result = calculateLeastCommonMultipleOfList(calculateAllRoutesSteps(instructions, nodeRoutes))
+    val nodeOrigins = nodeMap.values.filter(Node::isOrigin)
+    val routesStepsList = calculateAllRoutesSteps(instructions, nodeOrigins, nodeMap)
+    val result = calculateLeastCommonMultipleOfList(routesStepsList)
 
     println(result)
 }
 
-fun calculateAllRoutesSteps(instructions: String, nodeList: List<Node>): List<Long> {
-    return nodeList.map { calculateRoutSteps(instructions, it) }
+fun calculateAllRoutesSteps(instructions: String, originNodeList: List<Node>, nodeMap: Map<String, Node>): List<Long> {
+    return originNodeList.map { calculateRoutSteps(instructions, it, nodeMap) }
 }
 
-fun calculateRoutSteps(instructions: String, node: Node): Long {
+fun calculateRoutSteps(instructions: String, node: Node, nodeMap: Map<String, Node>): Long {
+    val indexAdjustment = 1
     var result = 0L
     var repeat = 0
     var tempNode = node.copy()
     while (result.isZero()) {
         instructions.forEachIndexed { index, instruction ->
-            tempNode = searchNextNode(tempNode, instruction)
+            tempNode = searchNextNode(tempNode, instruction, nodeMap)
             if (Node.arriveToDestiny(tempNode)) result = (index + indexAdjustment).toLong()
         }
         if (!result.isZero()) result += (instructions.length * repeat)
@@ -52,7 +49,8 @@ fun calculateRoutSteps(instructions: String, node: Node): Long {
     return result
 }
 
-fun searchNextNode(node: Node, instruction: Char): Node {
+fun searchNextNode(node: Node, instruction: Char, nodeMap: Map<String, Node>): Node {
+    val leftInstruction = 'L'
     return if (instruction == leftInstruction) nodeMap[node.nextLeft]!! else nodeMap[node.nextRight]!!
 }
 
@@ -104,8 +102,14 @@ data class Node(val nodeName: String, val nextLeft: String, val nextRight: Strin
             )
         }
 
-        fun arriveToDestiny(node: Node) = node.nodeName.last() == destiny
+        fun arriveToDestiny(node: Node): Boolean {
+            val destiny = 'Z'
+            return node.nodeName.last() == destiny
+        }
 
-        fun isOrigin(node: Node) = node.nodeName.last() == origin
+        fun isOrigin(node: Node): Boolean {
+            val origin = 'A'
+            return node.nodeName.last() == origin
+        }
     }
 }
