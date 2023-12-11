@@ -19,18 +19,18 @@ fun main() {
     val lines = BufferedReader(InputStreamReader(file.inputStream())).use { fileReader ->
         fileReader.readLines()
     }
-
     tileMap = lines.mapIndexed { index, line ->
         line.mapIndexed { charIndex, char ->
             Coordinate(coordinateY = index, coordinateX = charIndex) to char
         }.toMap()
     }.flatMap { it.entries }.associate { Pair(it.key, it.value) }
 
-    start = tileMap.entries.first { it.value == 'S' }.key
+    start = tileMap.entries.first { it.value == START_END.value }.key
     coordinate = start.copy()
 
     val listStepsDefinitive = initialSteps.firstNotNullOf(::travelPipe)
     val result = countInsideLoopPipes(listLines = lines, listSteps = listStepsDefinitive)
+
     println(result)
 }
 

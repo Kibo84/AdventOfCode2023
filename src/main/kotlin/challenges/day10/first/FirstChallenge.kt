@@ -22,13 +22,8 @@ fun main() {
             }.toMap()
         }.flatMap { it.entries }.associate { Pair(it.key, it.value) }
     }
-    val initialSteps = listOf(
-        UP,
-        LEFT,
-        RIGHT,
-        DOWN
-    )
-    start = tileMap.entries.first { it.value == 'S' }.key
+    val initialSteps = listOf(UP, LEFT, RIGHT, DOWN)
+    start = tileMap.entries.first { it.value == START_END.value }.key
     coordinate = start.copy()
 
     val possibleRoutes = initialSteps.map(::travelPipe)
