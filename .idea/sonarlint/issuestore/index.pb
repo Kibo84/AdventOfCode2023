@@ -62,3 +62,13 @@ _
 /src/main/kotlin/challenges/day7/first/README.md,0\6\0632c880a5308b7cfe35f4805a98aae8e9bfb2a0
 `
 0src/main/kotlin/challenges/day7/second/README.md,3\7\379e1dc36e6ed3e85c2c0f0849a798d950e56fe2
+j
+:src/main/kotlin/challenges/day10/second/SecondChallenge.kt,f\2\f2b58050765ebb3aa8e877a81fa8d71bb2e5e1a7
+L
+src/inputs/output-day-10.txt,e\9\e90343a7f2421dc40fc3c4b5e38bea339afbd751
+`
+0src/main/kotlin/challenges/day10/first/README.md,c\2\c2bd6af833342334e36e67dd50e69afd8a4943b9
+`
+0src/main/kotlin/challenges/day9/second/README.md,6\0\607cbacd9f2a65800e7015f1c72079b2ec99fc50
+a
+1src/main/kotlin/challenges/day10/second/README.md,5\6\56e325ea98bc4d1f13bf33b89e6922254e04b1b9
