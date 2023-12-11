@@ -3,29 +3,15 @@ package challenges.day10.second
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
+import challenges.day10.second.Pipes.*
+import challenges.day10.second.Instruction.*
 
-const val startEnd = 'S'
-const val upDawn = '|'
-const val leftDown = '7'
-const val leftRight = '-'
-const val leftUp = 'J'
-const val rightUp = 'L'
-const val rightDown = 'F'
 const val stepAdjustment = 1
-val initialSteps = listOf(
-    Instruction.UP,
-    Instruction.LEFT,
-    Instruction.RIGHT,
-    Instruction.DOWN
-)
-val northSteps = listOf(
-    upDawn,
-    leftUp,
-    rightUp
-)
-val tileMap: MutableMap<Coordinate, Char> = mutableMapOf()
-var start: Coordinate = Coordinate(0, 0)
-var coordinate: Coordinate = Coordinate(0, 0)
+val initialSteps = listOf(UP, LEFT, RIGHT, DOWN)
+val northSteps = listOf(UP_DOWN.value, LEFT_UP.value, RIGHT_UP.value)
+lateinit var tileMap: Map<Coordinate, Char>
+lateinit var start: Coordinate
+lateinit var coordinate: Coordinate
 
 fun main() {
     val file = File("src/inputs/input-day-10.txt")
@@ -34,11 +20,11 @@ fun main() {
         fileReader.readLines()
     }
 
-    lines.forEachIndexed { index, line ->
-        line.forEachIndexed { charIndex, char ->
-            tileMap[Coordinate(coordinateY = index, coordinateX = charIndex)] = char
-        }
-    }
+    tileMap = lines.mapIndexed { index, line ->
+        line.mapIndexed { charIndex, char ->
+            Coordinate(coordinateY = index, coordinateX = charIndex) to char
+        }.toMap()
+    }.flatMap { it.entries }.associate { Pair(it.key, it.value) }
 
     start = tileMap.entries.first { it.value == 'S' }.key
     coordinate = start.copy()
@@ -51,10 +37,10 @@ fun main() {
 fun travelPipe(instruction: Instruction): List<Coordinate>? {
     val listSteps: MutableList<Coordinate> = mutableListOf()
     var nextInstruction = instruction
-    while (nextInstruction != Instruction.STOP && nextInstruction != Instruction.ARRIVE) {
+    while (nextInstruction != STOP && nextInstruction != ARRIVE) {
         nextInstruction = nextMove(nextInstruction, listSteps)
     }
-    if (nextInstruction == Instruction.STOP) {
+    if (nextInstruction == STOP) {
         coordinate = start
         return null
     }
@@ -63,10 +49,10 @@ fun travelPipe(instruction: Instruction): List<Coordinate>? {
 
 fun nextMove(instruction: Instruction, listSteps: MutableList<Coordinate>): Instruction {
     return when(instruction) {
-        Instruction.UP -> moveToUp(listSteps)
-        Instruction.LEFT -> moveToLeft(listSteps)
-        Instruction.RIGHT -> moveToRight(listSteps)
-        Instruction.DOWN -> moveToDown(listSteps)
+        UP -> moveToUp(listSteps)
+        LEFT -> moveToLeft(listSteps)
+        RIGHT -> moveToRight(listSteps)
+        DOWN -> moveToDown(listSteps)
         else -> instruction
     }
 }
@@ -75,11 +61,11 @@ fun moveToUp(listSteps: MutableList<Coordinate>): Instruction {
     listSteps.add(coordinate.copy())
     coordinate.coordinateY -= stepAdjustment
     return when (tileMap[coordinate]) {
-        upDawn -> Instruction.UP
-        leftDown -> Instruction.LEFT
-        rightDown -> Instruction.RIGHT
-        startEnd -> Instruction.ARRIVE
-        else -> Instruction.STOP
+        UP_DOWN.value -> UP
+        LEFT_DOWN.value -> LEFT
+        RIGHT_DOWN.value -> RIGHT
+        START_END.value -> ARRIVE
+        else -> STOP
     }
 }
 
@@ -87,11 +73,11 @@ fun moveToLeft(listSteps: MutableList<Coordinate>): Instruction {
     listSteps.add(coordinate.copy())
     coordinate.coordinateX -= stepAdjustment
     return when (tileMap[coordinate]) {
-        leftRight -> Instruction.LEFT
-        rightUp -> Instruction.UP
-        rightDown -> Instruction.DOWN
-        startEnd -> Instruction.ARRIVE
-        else -> Instruction.STOP
+        LEFT_RIGHT.value -> LEFT
+        RIGHT_UP.value -> UP
+        RIGHT_DOWN.value -> DOWN
+        START_END.value -> ARRIVE
+        else -> STOP
     }
 }
 
@@ -99,11 +85,11 @@ fun moveToDown(listSteps: MutableList<Coordinate>): Instruction {
     listSteps.add(coordinate.copy())
     coordinate.coordinateY += stepAdjustment
     return when (tileMap[coordinate]) {
-        upDawn -> Instruction.DOWN
-        rightUp -> Instruction.RIGHT
-        leftUp -> Instruction.LEFT
-        startEnd -> Instruction.ARRIVE
-        else -> Instruction.STOP
+        UP_DOWN.value -> DOWN
+        RIGHT_UP.value -> RIGHT
+        LEFT_UP.value -> LEFT
+        START_END.value -> ARRIVE
+        else -> STOP
     }
 }
 
@@ -111,23 +97,21 @@ fun moveToRight(listSteps: MutableList<Coordinate>): Instruction {
     listSteps.add(coordinate.copy())
     coordinate.coordinateX += stepAdjustment
     return when (tileMap[coordinate]) {
-        leftRight -> Instruction.RIGHT
-        leftDown -> Instruction.DOWN
-        leftUp -> Instruction.UP
-        startEnd -> Instruction.ARRIVE
-        else -> Instruction.STOP
+        LEFT_RIGHT.value -> RIGHT
+        LEFT_DOWN.value -> DOWN
+        LEFT_UP.value -> UP
+        START_END.value -> ARRIVE
+        else -> STOP
     }
 }
 
 fun countInsideLoopPipes(listLines: List<String>, listSteps: List<Coordinate>): Int {
-    val listString = mutableListOf<String>()
     var insideLoop = false
     var insideLoopCount = 0
     listLines.forEachIndexed { index, line ->
-        var newLine = ""
         line.forEachIndexed { charIndex, char ->
             var charCopy = char
-            if (charCopy == 'S') charCopy = '|'
+            if (char == START_END.value) charCopy = UP_DOWN.value
             val cord = Coordinate(coordinateY = index, coordinateX = charIndex)
             if (cord in listSteps && charCopy in northSteps) {
                 insideLoop = !insideLoop
@@ -135,20 +119,21 @@ fun countInsideLoopPipes(listLines: List<String>, listSteps: List<Coordinate>): 
             if (cord !in listSteps && insideLoop) {
                 insideLoopCount++
             }
-            newLine += charCopy
         }
-        listString.add(newLine)
     }
     return insideLoopCount
 }
 
 data class Coordinate(var coordinateY: Int, var coordinateX: Int)
 
-enum class Instruction {
-    UP,
-    LEFT,
-    RIGHT,
-    DOWN,
-    STOP,
-    ARRIVE
+enum class Instruction { UP, LEFT, RIGHT, DOWN, STOP, ARRIVE }
+
+enum class Pipes(val value: Char) {
+    START_END('S'),
+    UP_DOWN('|'),
+    LEFT_DOWN('7'),
+    LEFT_RIGHT('-'),
+    LEFT_UP('J'),
+    RIGHT_UP('L'),
+    RIGHT_DOWN('F')
 }

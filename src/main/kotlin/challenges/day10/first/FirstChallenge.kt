@@ -3,36 +3,30 @@ package challenges.day10.first
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
+import challenges.day10.first.Pipes.*
+import challenges.day10.first.Instruction.*
 
-const val startEnd = 'S'
-const val upDawn = '|'
-const val leftDown = '7'
-const val leftRight = '-'
-const val leftUp = 'J'
-const val rightUp = 'L'
-const val rightDown = 'F'
 const val stepAdjustment = 1
 const val pipeDivider = 2
-var listSteps: MutableList<Coordinate> = mutableListOf()
-val tileMap: MutableMap<Coordinate, Char> = mutableMapOf()
-var start: Coordinate = Coordinate(0, 0)
-var coordinate: Coordinate = Coordinate(0, 0)
+lateinit var tileMap: Map<Coordinate, Char>
+lateinit var start: Coordinate
+lateinit var coordinate: Coordinate
 
 fun main() {
     val file = File("src/inputs/input-day-10.txt")
 
-    BufferedReader(InputStreamReader(file.inputStream())).use { fileReader ->
-        fileReader.readLines().forEachIndexed { index, line ->
-            line.forEachIndexed { charIndex, char ->
-                tileMap[Coordinate(coordinateY = index, coordinateX = charIndex)] = char
-            }
-        }
+    tileMap = BufferedReader(InputStreamReader(file.inputStream())).use { fileReader ->
+        fileReader.readLines().mapIndexed { index, line ->
+            line.mapIndexed { charIndex, char ->
+                Coordinate(coordinateY = index, coordinateX = charIndex) to char
+            }.toMap()
+        }.flatMap { it.entries }.associate { Pair(it.key, it.value) }
     }
     val initialSteps = listOf(
-        Instruction.UP,
-        Instruction.LEFT,
-        Instruction.RIGHT,
-        Instruction.DOWN
+        UP,
+        LEFT,
+        RIGHT,
+        DOWN
     )
     start = tileMap.entries.first { it.value == 'S' }.key
     coordinate = start.copy()
@@ -44,83 +38,86 @@ fun main() {
 }
 
 fun travelPipe(instruction: Instruction): List<Coordinate>? {
+    val listSteps: MutableList<Coordinate> = mutableListOf()
     var nextInstruction = instruction
-    while (nextInstruction != Instruction.STOP && nextInstruction != Instruction.ARRIVE) {
-        nextInstruction = nextMove(nextInstruction)
+    while (nextInstruction != STOP && nextInstruction != ARRIVE) {
+        nextInstruction = nextMove(nextInstruction, listSteps)
     }
-    if (nextInstruction == Instruction.STOP) {
+    if (nextInstruction == STOP) {
         coordinate = start
-        listSteps = mutableListOf()
         return null
     }
     return listSteps.toList()
 }
 
-fun nextMove(instruction: Instruction): Instruction {
+fun nextMove(instruction: Instruction, listSteps: MutableList<Coordinate>): Instruction {
     return when(instruction) {
-        Instruction.UP -> moveToUp()
-        Instruction.LEFT -> moveToLeft()
-        Instruction.RIGHT -> moveToRight()
-        Instruction.DOWN -> moveToDown()
+        UP -> moveToUp(listSteps)
+        LEFT -> moveToLeft(listSteps)
+        RIGHT -> moveToRight(listSteps)
+        DOWN -> moveToDown(listSteps)
         else -> instruction
     }
 }
 
-fun moveToUp(): Instruction {
-    if (coordinate != start) listSteps.add(coordinate.copy())
+fun moveToUp(listSteps: MutableList<Coordinate>): Instruction {
+    listSteps.add(coordinate.copy())
     coordinate.coordinateY -= stepAdjustment
     return when (tileMap[coordinate]) {
-        upDawn -> Instruction.UP
-        leftDown -> Instruction.LEFT
-        rightDown -> Instruction.RIGHT
-        startEnd -> Instruction.ARRIVE
-        else -> Instruction.STOP
+        UP_DOWN.value -> UP
+        LEFT_DOWN.value -> LEFT
+        RIGHT_DOWN.value -> RIGHT
+        START_END.value -> ARRIVE
+        else -> STOP
     }
 }
 
-fun moveToLeft(): Instruction {
-    if (coordinate != start) listSteps.add(coordinate.copy())
+fun moveToLeft(listSteps: MutableList<Coordinate>): Instruction {
+    listSteps.add(coordinate.copy())
     coordinate.coordinateX -= stepAdjustment
     return when (tileMap[coordinate]) {
-        leftRight -> Instruction.LEFT
-        rightUp -> Instruction.UP
-        rightDown -> Instruction.DOWN
-        startEnd -> Instruction.ARRIVE
-        else -> Instruction.STOP
+        LEFT_RIGHT.value -> LEFT
+        RIGHT_UP.value -> UP
+        RIGHT_DOWN.value -> DOWN
+        START_END.value -> ARRIVE
+        else -> STOP
     }
 }
 
-fun moveToDown(): Instruction {
-    if (coordinate != start) listSteps.add(coordinate.copy())
+fun moveToDown(listSteps: MutableList<Coordinate>): Instruction {
+    listSteps.add(coordinate.copy())
     coordinate.coordinateY += stepAdjustment
     return when (tileMap[coordinate]) {
-        upDawn -> Instruction.DOWN
-        rightUp -> Instruction.RIGHT
-        leftUp -> Instruction.LEFT
-        startEnd -> Instruction.ARRIVE
-        else -> Instruction.STOP
+        UP_DOWN.value -> DOWN
+        RIGHT_UP.value -> RIGHT
+        LEFT_UP.value -> LEFT
+        START_END.value -> ARRIVE
+        else -> STOP
     }
 }
 
-fun moveToRight(): Instruction {
-    if (coordinate != start) listSteps.add(coordinate.copy())
+fun moveToRight(listSteps: MutableList<Coordinate>): Instruction {
+    listSteps.add(coordinate.copy())
     coordinate.coordinateX += stepAdjustment
     return when (tileMap[coordinate]) {
-        leftRight -> Instruction.RIGHT
-        leftDown -> Instruction.DOWN
-        leftUp -> Instruction.UP
-        startEnd -> Instruction.ARRIVE
-        else -> Instruction.STOP
+        LEFT_RIGHT.value -> RIGHT
+        LEFT_DOWN.value -> DOWN
+        LEFT_UP.value -> UP
+        START_END.value -> ARRIVE
+        else -> STOP
     }
 }
 
 data class Coordinate(var coordinateY: Int, var coordinateX: Int)
 
-enum class Instruction {
-    UP,
-    LEFT,
-    RIGHT,
-    DOWN,
-    STOP,
-    ARRIVE
+enum class Instruction { UP, LEFT, RIGHT, DOWN, STOP, ARRIVE }
+
+enum class Pipes(val value: Char) {
+    START_END('S'),
+    UP_DOWN('|'),
+    LEFT_DOWN('7'),
+    LEFT_RIGHT('-'),
+    LEFT_UP('J'),
+    RIGHT_UP('L'),
+    RIGHT_DOWN('F')
 }
