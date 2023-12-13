@@ -15,7 +15,7 @@ fun main() {
         fileReader.readLines()
     }
 
-    val result = lines.map(::unfold).map(::solutions).sum()
+    val result = lines.map(::fromString).map(::solutions).sum()
 
     println(result)
 }
@@ -55,7 +55,7 @@ fun solutions(spring: Spring): Long {
     return permutations.filterKeys { isValid(it.groupId, it.groupAmount, spring) }.values.sum()
 }
 
-fun unfold(line: String): Spring {
+fun fromString(line: String): Spring {
     val springConfigDelimiter = ' '
     val configsDelimiter = ','
     val repeats = 5
