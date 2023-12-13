@@ -14,68 +14,65 @@ fun main() {
     val lines = BufferedReader(InputStreamReader(file.inputStream())).use { fileReader ->
         fileReader.readLines()
     }
+
+    val result = lines.map(::unfold).map(::solutions).sum()
+
+    println(result)
 }
 
-fun createRegex(damagedRepeats: List<Int>): Regex {
-    var stringRegex = "^\\.*"
-    damagedRepeats.forEachIndexed { index, int ->
-        stringRegex += if (index != damagedRepeats.lastIndex) "#{$int}\\.+" else "#{$int}\\.*\$"
-    }
-
-    return stringRegex.toRegex()
-}
-
-fun calculatePossibilities(arrangedSprings: ArrangedSprings): Int {
-    val regex = createRegex(arrangedSprings.damaged)
-    val (arrange, damaged) = arrangedSprings
-    val possibilities = replaceAllIncognita(listOf(arrange), damaged)
-
-    return possibilities.count { regex.matches(it) }
-}
-
-fun replaceAllIncognita(possibilities: List<String>, damaged: MutableList<Int>): List<String> {
-    val copyList = mutableListOf<String>()
-    val damageRepeats = damaged.removeFirst()
-    val stringToSearch = "[#\\?]{$damageRepeats}"
-    val stringToReplace = damage.toString().repeat(damageRepeats)
-
-    possibilities.forEach { possibility ->
-        val listIndex = findAllIndices(possibility, stringToSearch)
-        listIndex.forEach { index ->
-            val modifyString = possibility.replaceFromIndex(stringToSearch, stringToReplace, index)
-            modifyString?.let { copyList.add(it) }
+fun solutions(spring: Spring): Long {
+    val initialGroupId = 0
+    val initialGroupAmount = 0
+    val initialPermutationCount = 1L
+    val defaultValue = 0L
+    val incrementId = 1
+    val permutations = mutableMapOf(PermutationKey(initialGroupId, initialGroupAmount) to initialPermutationCount)
+    spring.spring.forEach { character ->
+        val nextGroup = mutableListOf<Triple<Int, Int, Long>>()
+        permutations.forEach { entry ->
+            val groupAmount = entry.key.groupAmount
+            val groupId = entry.key.groupId
+            val permCount = entry.value
+            if (character != damage) {
+                if (groupAmount == initialGroupAmount) {
+                    nextGroup.add(Triple(groupId, groupAmount, permCount))
+                } else if (groupAmount == spring.conditions[groupId]) {
+                    nextGroup.add(Triple(groupId + incrementId, initialGroupAmount, permCount))
+                }
+            }
+            if (character != operational && groupId < spring.conditions.size
+                && groupAmount < spring.conditions[groupId]
+                ) {
+                nextGroup.add(Triple(groupId, groupAmount + incrementId, permCount))
+            }
+        }
+        permutations.clear()
+        nextGroup.forEach { (groupId, groupAmount, permCount) ->
+            permutations[PermutationKey(groupId, groupAmount)] =
+                permutations.getOrDefault(PermutationKey(groupId, groupAmount), defaultValue) + permCount
         }
     }
-
-    if (damaged.isEmpty()) {
-        copyList.map { it.replace(incognita, operational) }.toList().map(::println)
-        return copyList
-    } else {
-        return replaceAllIncognita(copyList, damaged)
-    }
+    return permutations.filterKeys { isValid(it.groupId, it.groupAmount, spring) }.values.sum()
 }
 
-fun findAllIndices(mainString: String, searchString: String): List<Int> {
-    val indices = mutableListOf<Int>()
-    val regex = searchString.toRegex()
-    val matches = regex.findAll(mainString)
-
-    for (match in matches) {
-        indices.add(match.range.first)
-    }
-
-    return indices
+fun unfold(line: String): Spring {
+    val springConfigDelimiter = ' '
+    val configsDelimiter = ','
+    val repeats = 5
+    val (springs, config) = line.split(springConfigDelimiter)
+    val springConfig = config.split(configsDelimiter).map(String::toInt)
+    val modSprings = List(repeats) { springs }
+    val modConfig = mutableListOf<Int>()
+    repeat(repeats) { modConfig.addAll(springConfig) }
+    return Spring(modSprings.joinToString(incognita.toString()), modConfig.toList())
 }
 
-fun String.replaceFromIndex(targetSequence: String, replacement: String, index: Int): String? {
-    if (index < 0 || index >= this.length) {
-        return null
-    }
-    val prefix = this.substring(0, index)
-    val suffix = this.substring(index)
-    val regex = targetSequence.toRegex()
+data class Spring(val spring: String, val conditions: List<Int>)
 
-    return prefix + regex.replaceFirst(suffix, replacement)
+data class PermutationKey(var groupId: Int, var groupAmount: Int)
+
+fun isValid(groupId: Int, groupAmount: Int, spring: Spring): Boolean {
+    val indexAdjustment = 1
+    return groupId == spring.conditions.size
+            || groupId == spring.conditions.size - indexAdjustment && groupAmount == spring.conditions[groupId]
 }
-
-data class ArrangedSprings(val arrange: String, val damaged: MutableList<Int>)
