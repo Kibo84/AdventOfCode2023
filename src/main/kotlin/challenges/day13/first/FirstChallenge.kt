@@ -37,6 +37,7 @@ class Ash(private val ground: List<CharArray>) {
         val lastIndex = calculateLastIndex(axe)
         var linesMirrored = 0
         var countLinesMirrored: Int? = null
+        val minValue = 0
 
         for (index in firstIndex ..< lastIndex) {
             var tempLinesMirrored = 0
@@ -60,7 +61,7 @@ class Ash(private val ground: List<CharArray>) {
                 countLinesMirrored = index + indexAdjustment
             }
         }
-        return Result(linesMirrored = linesMirrored, value = countLinesMirrored ?: 0)
+        return Result(linesMirrored = linesMirrored, value = countLinesMirrored ?: minValue)
     }
 
     private fun extractLine(index: Int, axe: Axe): CharArray {
