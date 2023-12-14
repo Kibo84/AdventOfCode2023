@@ -62,3 +62,5 @@ j
 :src/main/kotlin/challenges/day13/second/SecondChallenge.kt,c\7\c73174f32861ea13577be8ac8c56a848b22c044a
 Z
 *src/main/kotlin/challenges/day13/README.md,5\4\545ae1c51566f84950dd8169bcfa1ad716a5135a
+K
+src/inputs/input-day-14.txt,b\e\be854dca211e04aeffac04947cb4423253df98eb
