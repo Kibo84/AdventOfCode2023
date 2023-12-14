@@ -12,108 +12,68 @@ fun main() {
     }
 
     val ashes = Ash.fromStrings(lines)
-    val result = ashes.map(Ash::calculate).sum()
+    val result = ashes.map(Ash::calculateValue).sum()
     println(result)
 }
 
-fun isValid(line1: CharArray, line2: CharArray) = line1.contentEquals(line2)
+enum class Axe { VERTICAL, HORIZONTAL }
 
-data class Ash(val ground: List<CharArray>) {
+class Ash(private val ground: List<CharArray>) {
+    fun calculateValue(): Int {
+        val multiplierHorizontal = 100
+        val resultHorizontal = calculateMirroring(Axe.HORIZONTAL)
+        val resultVertical = calculateMirroring(Axe.VERTICAL)
 
-    fun calculate(): Int {
-        val pairHorizontal = calculateHorizontally()
-        val pairVertical = calculateVertically()
-
-        return if (pairHorizontal.first > pairVertical.first) pairHorizontal.second else pairVertical.second
+        return if (resultHorizontal.linesMirrored > resultVertical.linesMirrored) {
+            resultHorizontal.value * multiplierHorizontal
+        } else {
+            resultVertical.value
+        }
     }
 
-    private fun calculateHorizontally(): Pair<Int, Int> {
-        val zero = 0
+    private fun calculateMirroring(axe: Axe): Result {
         val indexAdjustment = 1
         val firstIndex = 0
-        val lastIndex = ground.lastIndex
-        val multiplier = 100
+        val lastIndex = calculateLastIndex(axe)
         var linesMirrored = 0
-        var isMirror: Boolean
-        var indexToReturn: Int? = null
-        var result = 0
+        var countLinesMirrored: Int? = null
 
-        ground.forEachIndexed { index, line ->
+        for (index in firstIndex ..< lastIndex) {
             var tempLinesMirrored = 0
-            if (index != ground.lastIndex) {
-                var nextIndex = index + indexAdjustment
-                var nextLine = ground[nextIndex]
-                if (isValid(line, nextLine)) {
+            var linesCompared = 0
+            var indexFirstLine = index
+            var indexSecondLine = index + indexAdjustment
+            var isValid = true
+            while (isValid && indexFirstLine >= firstIndex && indexSecondLine <= lastIndex) {
+                linesCompared++
+                val line1 = extractLine(indexFirstLine, axe)
+                val line2 = extractLine(indexSecondLine, axe)
+                isValid = isValid(line1, line2)
+                if (isValid) {
                     tempLinesMirrored++
-                    isMirror = true
-                    var previousIndex = index - indexAdjustment
-                    nextIndex++
-                    while (isMirror && previousIndex >= firstIndex && nextIndex <= lastIndex) {
-                        val previousLine = ground[previousIndex]
-                        nextLine = ground[nextIndex]
-                        isMirror = isValid(previousLine, nextLine)
-                        if (isMirror) {
-                            tempLinesMirrored++
-                            previousIndex--
-                            nextIndex++
-                        }
-                    }
-                    isMirror = false
-                    if (tempLinesMirrored > linesMirrored) {
-                        linesMirrored = tempLinesMirrored
-                        indexToReturn = index + indexAdjustment
-                    }
+                    indexFirstLine--
+                    indexSecondLine++
                 }
             }
+            if (tempLinesMirrored > linesMirrored && linesCompared == tempLinesMirrored) {
+                linesMirrored = tempLinesMirrored
+                countLinesMirrored = index + indexAdjustment
+            }
         }
-        indexToReturn?.let { result = it * multiplier }
-
-        return Pair(linesMirrored, result)
+        return Result(linesMirrored = linesMirrored, value = countLinesMirrored ?: 0)
     }
 
-    private fun calculateVertically(): Pair<Int, Int> {
-        val zero = 0
+    private fun extractLine(index: Int, axe: Axe): CharArray {
+        return if (axe == Axe.VERTICAL) ground.map { it[index] }.toCharArray() else ground[index]
+    }
+
+    private fun calculateLastIndex(axe: Axe): Int {
         val indexAdjustment = 1
         val firstIndex = 0
-        val lastIndex = ground[0].size - indexAdjustment
-        var linesMirrored = 0
-        var isMirror: Boolean
-        var indexToReturn: Int? = null
-        var result = 0
-
-        for (index in firstIndex .. lastIndex) {
-            var tempLinesMirrored = 0
-            if (index != lastIndex) {
-                var nextIndex = index + indexAdjustment
-                var line1 = ground.map { it[index] }.toCharArray()
-                var line2 = ground.map { it[nextIndex] }.toCharArray()
-                if (isValid(line1, line2)) {
-                    tempLinesMirrored++
-                    isMirror = true
-                    var previousIndex = index - indexAdjustment
-                    nextIndex++
-                    while (isMirror && previousIndex >= firstIndex && nextIndex <= lastIndex) {
-                        line1 = ground.map { it[previousIndex] }.toCharArray()
-                        line2 = ground.map { it[nextIndex] }.toCharArray()
-                        isMirror = isValid(line1, line2)
-                        if (isMirror) {
-                            tempLinesMirrored++
-                            previousIndex--
-                            nextIndex++
-                        }
-                    }
-                    isMirror = false
-                    if (tempLinesMirrored > linesMirrored) {
-                        linesMirrored = tempLinesMirrored
-                        indexToReturn = index + indexAdjustment
-                    }
-                }
-            }
-        }
-        indexToReturn?.let { result = it }
-
-        return Pair(linesMirrored, result)
+        return (if (axe == Axe.VERTICAL) ground[firstIndex].size else ground.size) - indexAdjustment
     }
+
+    private fun isValid(line1: CharArray, line2: CharArray) = line1.joinToString() == line2.joinToString()
 
     companion object {
         fun fromStrings(lines: List<String>): List<Ash> {
@@ -132,3 +92,5 @@ data class Ash(val ground: List<CharArray>) {
         }
     }
 }
+
+class Result(val linesMirrored: Int, val value: Int)
