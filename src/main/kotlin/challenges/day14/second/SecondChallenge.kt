@@ -3,9 +3,14 @@ package challenges.day14.second
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
+import challenges.day14.second.Directions.*
+import challenges.day14.second.Axis.*
 
 const val movableRock = 'O'
 const val space = '.'
+
+enum class Directions { UP, DOWN, LEFT, RIGHT }
+enum class Axis { HORIZONTAL, VERTICAL }
 
 fun main() {
     val file = File("src/inputs/input-day-14.txt")
@@ -22,104 +27,46 @@ fun main() {
 
 fun readMatrixFromLines(lines: List<String>) = lines.map { it.toCharArray().toList() }.toList()
 
-fun rocksToNorth(matrix: List<List<Char>>): List<List<Char>> {
+fun rocksToDirection(matrix: List<List<Char>>, direction: Directions): List<List<Char>> {
+
     val copyOfMatrix = matrix.map { it.toMutableList() }.toMutableList()
-    val indexAdjustment = 1
-    val unchanged = 0
-    var exitLoop = false
-
-    while (!exitLoop) {
-        var changes = 0
-        copyOfMatrix.forEachIndexed { rowIndex, row ->
-            row.forEachIndexed { index, char ->
-                if (rowIndex != copyOfMatrix.lastIndex) {
-                    val nextIndex = rowIndex + indexAdjustment
-                    val nextChar = copyOfMatrix[nextIndex][index]
-                    if (char == space && nextChar == movableRock) {
-                        copyOfMatrix[rowIndex][index] = nextChar.also { copyOfMatrix[nextIndex][index] = char }
-                        changes++
-                    }
-                }
-            }
-        }
-        if (changes == unchanged) exitLoop = true
-    }
-    return copyOfMatrix.map { it.toList() }.toList()
-}
-
-fun rocksToWest(matrix: List<List<Char>>): List<List<Char>> {
-    val copyOfMatrix = matrix.map { it.toMutableList() }.toMutableList()
-    val indexAdjustment = 1
-    val unchanged = 0
-    var exitLoop = false
-
-    while (!exitLoop) {
-        var changes = 0
-        copyOfMatrix.forEach { row ->
-            row.forEachIndexed { index, char ->
-                if (index != row.lastIndex) {
-                    val nextIndex = index + indexAdjustment
-                    val nextChar = row[nextIndex]
-                    if (char == space && nextChar == movableRock) {
-                        row[index] = nextChar.also { row[nextIndex] = char }
-                        changes++
-                    }
-                }
-            }
-        }
-        if (changes == unchanged) exitLoop = true
-    }
-    return copyOfMatrix.map { it.toList() }.toList()
-}
-
-fun rocksToSouth(matrix: List<List<Char>>): List<List<Char>> {
-    val copyOfMatrix = matrix.map { it.toMutableList() }.toMutableList()
-    val indexAdjustment = 1
-    val unchanged = 0
     val firstIndex = 0
-    var exitLoop = false
-
-    while (!exitLoop) {
-        var changes = 0
-        copyOfMatrix.forEachIndexed { rowIndex, row ->
-            row.forEachIndexed { index, char ->
-                if (rowIndex != firstIndex) {
-                    val previousIndex = rowIndex - indexAdjustment
-                    val previousChar = copyOfMatrix[previousIndex][index]
-                    if (char == space && previousChar == movableRock) {
-                        copyOfMatrix[rowIndex][index] = previousChar.also { copyOfMatrix[previousIndex][index] = char }
-                        changes++
-                    }
-                }
-            }
-        }
-        if (changes == unchanged) exitLoop = true
-    }
-    return copyOfMatrix.map { it.toList() }.toList()
-}
-
-fun rocksToEast(matrix: List<List<Char>>): List<List<Char>> {
-    val copyOfMatrix = matrix.map { it.toMutableList() }.toMutableList()
-    val indexAdjustment = 1
     val unchanged = 0
-    val firstIndex = 0
+    val axis = if (direction == LEFT || direction == RIGHT) HORIZONTAL else VERTICAL
+    val indexAdjustment = if (direction == LEFT || direction == UP) 1 else -1
+    val lastIndex = if (axis == HORIZONTAL) copyOfMatrix[firstIndex].lastIndex else copyOfMatrix.lastIndex
     var exitLoop = false
 
     while (!exitLoop) {
-        var changes = 0
-        copyOfMatrix.forEach { row ->
-            row.forEachIndexed { index, char ->
-                if (index != firstIndex) {
-                    val previousIndex = index - indexAdjustment
-                    val previousChar = row[previousIndex]
-                    if (char == space && previousChar == movableRock) {
-                        row[index] = previousChar.also { row[previousIndex] = char }
-                        changes++
+        var changes = unchanged
+        copyOfMatrix.forEachIndexed { rowIndex, row ->
+            row.forEachIndexed { columnIndex, char ->
+                val index = if (axis == HORIZONTAL) columnIndex else rowIndex
+                val indexValid = if (direction == LEFT || direction == UP) index != lastIndex else index != firstIndex
+                val adjacentIndex = index + indexAdjustment
+                var adjacentChar: Char? = null
+                if (indexValid) {
+                    adjacentChar = when (axis) {
+                        HORIZONTAL -> row[adjacentIndex]
+                        VERTICAL -> copyOfMatrix[adjacentIndex][columnIndex]
                     }
+                }
+                if (char == space && adjacentChar != null && adjacentChar == movableRock) {
+                    when (axis) {
+                        HORIZONTAL -> {
+                            row[columnIndex] = adjacentChar.also { row[adjacentIndex] = char }
+                        }
+                        VERTICAL -> {
+                            copyOfMatrix[rowIndex][columnIndex] = adjacentChar.also {
+                                copyOfMatrix[adjacentIndex][columnIndex] = char
+                            }
+                        }
+                    }
+                    changes++
                 }
             }
         }
-        if (changes == unchanged) exitLoop = true
+        exitLoop = changes == unchanged
     }
     return copyOfMatrix.map { it.toList() }.toList()
 }
@@ -145,34 +92,28 @@ fun loopExecute(matrix: List<List<Char>>): Int {
     val indexAdjustment = 1
 
     while (!exitLoop) {
-        println("loop number: $loop")
+        matrixToReturn = rocksToDirection(matrixToReturn, UP)
+        matrixToReturn = rocksToDirection(matrixToReturn, LEFT)
+        matrixToReturn = rocksToDirection(matrixToReturn, DOWN)
+        matrixToReturn = rocksToDirection(matrixToReturn, RIGHT)
 
-        val matrixWithRocksToNorth = rocksToNorth(matrixToReturn)
-        val matrixWithRocksToWest = rocksToWest(matrixWithRocksToNorth)
-        val matrixWithRocksToSouth = rocksToSouth(matrixWithRocksToWest)
-        matrixToReturn = rocksToEast(matrixWithRocksToSouth)
-
-        val load = calculateLoadOfRow(matrixToReturn)
         if (!pattern.values.any { compareMatrix(it, matrixToReturn) }) {
             pattern[loop] = matrixToReturn
         } else {
             initPattern = pattern.entries.first { compareMatrix(it.value, matrixToReturn) }.key
             exitLoop = true
         }
-        println(load)
         loop++
     }
     val patternIndex = pattern.keys.filter { it in initPattern..< loop }
-    println(patternIndex)
     val loopToReturn = patternIndex[(generalLoopNumber - (initPattern + indexAdjustment)) % patternIndex.size]
-    println(loopToReturn)
     return calculateLoadOfRow(pattern[loopToReturn]!!)
 }
 
-fun compareMatrix(matrix1: List<List<Char>>, matrix2: List<List<Char>>): Boolean {
-    matrix1.forEachIndexed { index, chars ->
+fun compareMatrix(firstMatrix: List<List<Char>>, secondMatrix: List<List<Char>>): Boolean {
+    firstMatrix.forEachIndexed { index, chars ->
         chars.forEachIndexed { indexChar, char ->
-            if (char != matrix2[index][indexChar]) return false
+            if (char != secondMatrix[index][indexChar]) return false
         }
     }
     return true
