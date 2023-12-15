@@ -28,7 +28,6 @@ fun main() {
 fun readMatrixFromLines(lines: List<String>) = lines.map { it.toCharArray().toList() }.toList()
 
 fun rocksToDirection(matrix: List<List<Char>>, direction: Directions): List<List<Char>> {
-
     val copyOfMatrix = matrix.map { it.toMutableList() }.toMutableList()
     val firstIndex = 0
     val unchanged = 0
@@ -44,25 +43,24 @@ fun rocksToDirection(matrix: List<List<Char>>, direction: Directions): List<List
                 val index = if (axis == HORIZONTAL) columnIndex else rowIndex
                 val indexValid = if (direction == LEFT || direction == UP) index != lastIndex else index != firstIndex
                 val adjacentIndex = index + indexAdjustment
-                var adjacentChar: Char? = null
                 if (indexValid) {
-                    adjacentChar = when (axis) {
+                    val adjacentChar = when (axis) {
                         HORIZONTAL -> row[adjacentIndex]
                         VERTICAL -> copyOfMatrix[adjacentIndex][columnIndex]
                     }
-                }
-                if (char == space && adjacentChar != null && adjacentChar == movableRock) {
-                    when (axis) {
-                        HORIZONTAL -> {
-                            row[columnIndex] = adjacentChar.also { row[adjacentIndex] = char }
-                        }
-                        VERTICAL -> {
-                            copyOfMatrix[rowIndex][columnIndex] = adjacentChar.also {
-                                copyOfMatrix[adjacentIndex][columnIndex] = char
+                    if (char == space && adjacentChar == movableRock) {
+                        when (axis) {
+                            HORIZONTAL -> {
+                                row[columnIndex] = adjacentChar.also { row[adjacentIndex] = char }
+                            }
+                            VERTICAL -> {
+                                copyOfMatrix[rowIndex][columnIndex] = adjacentChar.also {
+                                    copyOfMatrix[adjacentIndex][columnIndex] = char
+                                }
                             }
                         }
+                        changes++
                     }
-                    changes++
                 }
             }
         }
