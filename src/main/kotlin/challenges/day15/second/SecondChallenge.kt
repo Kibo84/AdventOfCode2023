@@ -12,18 +12,15 @@ fun main() {
     val input = BufferedReader(InputStreamReader(file.inputStream())).use { fileReader ->
         fileReader.readLine().split(delimiter)
     }
-
-    val map = executeInstructions(input)
-
-    val result = map.entries.map(::calculatePower).sum()
+    val result = executeInstructions(input).entries.map(::calculatePower).sum()
 
     println(result)
 }
 
 fun executeInstructions(instructions: List<String>): Map<Int, MutableMap<String, Int>> {
-    val removeLens = '-'
-    val insertLens = '='
-    val map: Map<Int, MutableMap<String, Int>> = (0..255).associateWith { mutableMapOf() }
+    val firstBox = 0
+    val lastBox = 255
+    val map: Map<Int, MutableMap<String, Int>> = (firstBox..lastBox).associateWith { mutableMapOf() }
     instructions.map(::instructionsFactory).map { it.executeInstruction(map) }
 
     return map
@@ -51,15 +48,11 @@ fun hashAlgorithm(string: String): Int {
 }
 
 interface Instruction {
-    fun executeInstruction(
-        map: Map<Int, MutableMap<String, Int>>
-    ): Map<Int, MutableMap<String, Int>>
+    fun executeInstruction(map: Map<Int, MutableMap<String, Int>>): Map<Int, MutableMap<String, Int>>
 }
 
 class RemoveInstruction(private val instruction: String) : Instruction {
-    override fun executeInstruction(
-        map: Map<Int, MutableMap<String, Int>>
-    ): Map<Int, MutableMap<String, Int>> {
+    override fun executeInstruction(map: Map<Int, MutableMap<String, Int>>): Map<Int, MutableMap<String, Int>> {
         val delimiterInstruction = "-"
         val label = instruction.removeSuffix(delimiterInstruction)
         val box = hashAlgorithm(label)
@@ -70,9 +63,7 @@ class RemoveInstruction(private val instruction: String) : Instruction {
 }
 
 class InsertInstruction(private val instruction: String) : Instruction {
-    override fun executeInstruction(
-        map: Map<Int, MutableMap<String, Int>>
-    ): Map<Int, MutableMap<String, Int>> {
+    override fun executeInstruction(map: Map<Int, MutableMap<String, Int>>): Map<Int, MutableMap<String, Int>> {
         val delimiterInstruction = "="
         val (label, lens) = instruction.split(delimiterInstruction)
         val box = hashAlgorithm(label)
