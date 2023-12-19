@@ -72,3 +72,11 @@ g
 7src/main/kotlin/challenges/day6/first/FirstChallenge.kt,c\4\c414e79144a3b55fa4a70cdc50ebf876606977bf
 g
 7src/main/kotlin/challenges/day9/first/FirstChallenge.kt,9\3\93acc0e7e046c4f56a19895e198568156fafa246
+K
+src/inputs/input-day-17.txt,3\8\38579db634d893aada730118c398d6f92ddde500
+h
+8src/main/kotlin/challenges/day17/first/FirstChallenge.kt,0\e\0ebcfda51ba6b1f0079865c164d2ccbc640c5992
+j
+:src/main/kotlin/challenges/day17/second/SecondChallenge.kt,c\e\cecd695800fd45a6a8f6900c1cab597419d46127
+Z
+*src/main/kotlin/challenges/day17/README.md,3\b\3be0772d5f57ec267d1e6d92d75482e82661e2b1
