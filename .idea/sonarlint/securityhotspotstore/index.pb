@@ -90,3 +90,9 @@ h
 8src/main/kotlin/challenges/day16/first/FirstChallenge.kt,b\e\be62ca5554af1e01c8380b0f15b26e39fc221e68
 Z
 *src/main/kotlin/challenges/day18/README.md,1\7\17c769e6fb7ee2585daea2e233785dc79fa351e0
+K
+src/inputs/input-day-19.txt,e\8\e8014434a0ea58433a10802417b1667151132e1d
+h
+8src/main/kotlin/challenges/day19/first/FirstChallenge.kt,4\6\4673fbaedd31f4f5ebb4d28af760dff4820ad40f
+j
+:src/main/kotlin/challenges/day19/second/SecondChallenge.kt,7\5\7572d69cc3efa4fb57427e47d6acb905be780780

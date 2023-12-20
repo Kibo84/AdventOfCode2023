@@ -8,8 +8,8 @@ import kotlin.math.abs
 enum class Directions(val value: Char, val x: Int, val y: Int) {
     UP('3', 0, -1),
     LEFT('2', -1, 0),
-    RIGHT('0', 1, 0),
-    DOWN('1', 0, 1)
+    DOWN('1', 0, 1),
+    RIGHT('0', 1, 0)
 }
 
 fun main() {
