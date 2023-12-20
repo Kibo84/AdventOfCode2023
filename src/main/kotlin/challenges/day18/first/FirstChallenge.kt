@@ -4,6 +4,7 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
 import kotlin.math.abs
+import challenges.day18.first.Directions.*
 
 enum class Directions(val value: String, val x: Int, val y: Int) {
     UP("U", 0, -1),
@@ -12,83 +13,69 @@ enum class Directions(val value: String, val x: Int, val y: Int) {
     DOWN("D", 0, 1)
 }
 
-const val sizeAdjustment = 1
-
 fun main() {
-    val file = File("src/inputs/input-day-18.txt")
+    val file = File("src/inputs/input-testing.txt")
 
     val instructions = BufferedReader(InputStreamReader(file.inputStream())).use { fileReader ->
         fileReader.readLines().map(Instruction::fromString)
     }
     
     val lagoon = drawLagoon(instructions)
+    val result = polygonArea(lagoon)
 
-    val matrixHeight = lagoon.keys.maxOf { it.first } + sizeAdjustment
-    val matrixWith = lagoon.keys.maxOf { it.second } + sizeAdjustment
-
-    val matrix = MutableList(matrixHeight) { MutableList(matrixWith) { ' ' } }
-    val copyOfMatrix = matrix.toMutableList()
-
-    matrix.forEachIndexed { indexLine, line ->
-        line.forEachIndexed { index, _ ->
-            if (Pair(indexLine, index) in lagoon.keys) {
-                copyOfMatrix[indexLine][index] = '#'
-            } else {
-                copyOfMatrix[indexLine][index] = '.'
-            }
-        }
-    }
-
-    copyOfMatrix.map {
-        it.map(::print)
-        println()
-    }
+    println(result)
 }
 
-fun drawLagoon(instructions: List<Instruction>): Map<Pair<Int, Int>, String> {
+fun drawLagoon(instructions: List<Instruction>): List<Position> {
     val firstPositionX = 0
     val firstPositionY = 0
     var actualPositionX = firstPositionX
     var actualPositionY = firstPositionY
     val positions = mutableListOf<Position>()
-    val map = mutableMapOf<Pair<Int, Int>, String>()
-    
-    instructions.forEach {
-        for (repeat in 0 ..< it.repeats) {
-            positions.add(
-                Position(
-                    color = it.color,
-                    coordinateX = actualPositionX,
-                    coordinateY = actualPositionY
-                )
+    var firstHorizontalDirection: Directions? = null
+    var firstVerticalDirection: Directions? = null
+
+    instructions.forEach { instruction ->
+        positions.add(
+            Position(
+                color = instruction.color,
+                coordinateX = actualPositionX,
+                coordinateY = actualPositionY
             )
-            actualPositionX += it.direction.x
-            actualPositionY += it.direction.y
+        )
+        var adjustment = 1
+//        if (instruction.direction == UP || instruction.direction == DOWN) {
+//            if (firstVerticalDirection == null) {
+//                firstVerticalDirection = instruction.direction
+//            }
+//            if (instruction.direction != firstVerticalDirection) adjustment = 0
+//        }
+        if (instruction.direction == LEFT || instruction.direction == RIGHT) {
+            if (instruction.direction != firstHorizontalDirection) adjustment = 0
+            firstHorizontalDirection = instruction.direction
         }
+        actualPositionX += (instruction.direction.x * (instruction.repeats + adjustment))
+        actualPositionY += (instruction.direction.y * (instruction.repeats + adjustment))
     }
-
-    val lagoon = centerLagoon(positions)
-
-    lagoon.forEach {
-        map[Pair(it.coordinateY, it.coordinateX)] = it.color
-    }
-    
-    return map.toMap()
+    positions.map(::println)
+    return positions
 }
 
-fun centerLagoon(positions: List<Position>): List<Position> {
-    val axeXAdjustment = abs(positions.minOf { it.coordinateX })
-    val axeYAdjustment = abs(positions.minOf { it.coordinateY })
-    val positionsToReturn = positions.toMutableList()
-    positions.forEachIndexed { index, position ->
-        positionsToReturn[index] = Position(
-            color = position.color,
-            coordinateX = position.coordinateX + axeXAdjustment,
-            coordinateY = position.coordinateY + axeYAdjustment
-        )
+fun polygonArea(vertices: List<Position>): Int {
+    val numberOfVertices = vertices.size
+    val firstPosition = 0
+    val positionAdjustment = 1
+    var area = 0
+
+    for (position in firstPosition ..< numberOfVertices) {
+        val current = vertices[position]
+        val next = vertices[(position + positionAdjustment) % numberOfVertices]
+        area += (current.coordinateX * next.coordinateY - next.coordinateX * current.coordinateY)
     }
 
-    return positionsToReturn
+    area = abs(area) / 2
+
+    return area
 }
 
 class Instruction(val direction: Directions, val repeats: Int, val color: String) {
