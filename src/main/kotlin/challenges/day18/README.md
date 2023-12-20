@@ -1,108 +1,88 @@
-# Advent of Code 2023 - Day 17
+# Advent of Code 2023 - Day 18
 
 ## Part One
 
-The lava starts flowing rapidly once the Lava Production Facility is operational. As you leave, the reindeer offers you a parachute, allowing you to quickly reach Gear Island.
+Thanks to your efforts, the machine parts factory is one of the first factories up and running since the lavafall came back. However, to catch up with the large backlog of parts requests, the factory will also need a large supply of lava for a while; the Elves have already started creating a large lagoon nearby for this purpose.
 
-As you descend, your bird's-eye view of Gear Island reveals why you had trouble finding anyone on your way up: half of Gear Island is empty, but the half below you is a giant factory city!
-
-You land near the gradually-filling pool of lava at the base of your new lavafall. Lavaducts will eventually carry the lava throughout the city, but to make use of it immediately, Elves are loading it into large crucibles on wheels.
-
-The crucibles are top-heavy and pushed by hand. Unfortunately, the crucibles become very difficult to steer at high speeds, and so it can be hard to go in a straight line for very long.
-
-To get Desert Island the machine parts it needs as soon as possible, you'll need to find the best way to get the crucible from the lava pool to the machine parts factory. To do this, you need to minimize heat loss while choosing a route that doesn't require the crucible to go in a straight line for too long.
-
-Fortunately, the Elves here have a map (your puzzle input) that uses traffic patterns, ambient temperature, and hundreds of other parameters to calculate exactly how much heat loss can be expected for a crucible entering any particular city block.
-
-For example:
+However, they aren't sure the lagoon will be big enough; they've asked you to take a look at the dig plan (your puzzle input). For example:
 
 ```plaintext
-2413432311323
-3215453535623
-3255245654254
-3446585845452
-4546657867536
-1438598798454
-4457876987766
-3637877979653
-4654967986887
-4564679986453
-1224686865563
-2546548887735
-4322674655533
+R 6 (#70c710)
+D 5 (#0dc571)
+L 2 (#5713f0)
+D 2 (#d2c081)
+R 2 (#59c680)
+D 2 (#411b91)
+L 5 (#8ceee2)
+U 2 (#caa173)
+L 1 (#1b58a2)
+U 2 (#caa171)
+R 2 (#7807d2)
+U 3 (#a77fa3)
+L 2 (#015232)
+U 2 (#7a21e3)
 ```
-Each city block is marked by a single digit that represents the amount of heat loss if the crucible enters that block. The starting point, the lava pool, is the top-left city block; the destination, the machine parts factory, is the bottom-right city block. (Because you already start in the top-left block, you don't incur that block's heat loss unless you leave that block and then return to it.)
+The digger starts in a 1 meter cube hole in the ground. They then dig the specified number of meters up (U), down (D), left (L), or right (R), clearing full 1 meter cubes as they go. The directions are given as seen from above, so if "up" were north, then "right" would be east, and so on. Each trench is also listed with the color that the edge of the trench should be painted as an RGB hexadecimal color code.
 
-Because it is difficult to keep the top-heavy crucible going in a straight line for very long, it can move at most three blocks in a single direction before it must turn 90 degrees left or right. The crucible also can't reverse direction; after entering each city block, it may only turn left, continue straight, or turn right.
-
-One way to minimize heat loss is this path:
+When viewed from above, the above example dig plan would result in the following loop of trench (#) having been dug out from otherwise ground-level terrain (.):
 
 ```plaintext
-2>>34^>>>1323
-32v>>>35v5623
-32552456v>>54
-3446585845v52
-4546657867v>6
-14385987984v4
-44578769877v6
-36378779796v>
-465496798688v
-456467998645v
-12246868655<v
-25465488877v5
-43226746555v>
+#######
+#.....#
+###...#
+..#...#
+..#...#
+###.###
+#...#..
+##..###
+.#....#
+.######
 ```
-This path never moves more than three consecutive blocks in the same direction and incurs a heat loss of only 102.
 
-Directing the crucible from the lava pool to the machine parts factory, but not moving more than three consecutive blocks in the same direction, what is the least heat loss it can incur?
+At this point, the trench could contain 38 cubic meters of lava. However, this is just the edge of the lagoon; the next step is to dig out the interior so that it is one meter deep as well:
+
+```plaintext
+#######
+#######
+#######
+..#####
+..#####
+#######
+#####..
+#######
+.######
+.######
+```
+Now, the lagoon can contain a much more respectable 62 cubic meters of lava. While the interior is dug out, the edges are also painted according to the color codes in the dig plan.
+
+The Elves are concerned the lagoon won't be large enough; if they follow their dig plan, how many cubic meters of lava could it hold?
 
 ## Part Two
 
-The crucibles of lava simply aren't large enough to provide an adequate supply of lava to the machine parts factory. Instead, the Elves are going to upgrade to ultra crucibles.
+The Elves were right to be concerned; the planned lagoon would be much too small.
 
-Ultra crucibles are even more difficult to steer than normal crucibles. Not only do they have trouble going in a straight line, but they also have trouble turning!
+After a few minutes, someone realizes what happened; someone swapped the color and instruction parameters when producing the dig plan. They don't have time to fix the bug; one of them asks if you can extract the correct instructions from the hexadecimal codes.
 
-Once an ultra crucible starts moving in a direction, it needs to move a minimum of four blocks in that direction before it can turn (or even before it can stop at the end). However, it will eventually start to get wobbly: an ultra crucible can move a maximum of ten consecutive blocks without turning.
+Each hexadecimal code is six hexadecimal digits long. The first five hexadecimal digits encode the distance in meters as a five-digit hexadecimal number. The last hexadecimal digit encodes the direction to dig: 0 means R, 1 means D, 2 means L, and 3 means U.
 
-In the above example, an ultra crucible could follow this path to minimize heat loss:
-
-```plaintext
-2>>>>>>>>1323
-32154535v5623
-32552456v4254
-34465858v5452
-45466578v>>>>
-143859879845v
-445787698776v
-363787797965v
-465496798688v
-456467998645v
-122468686556v
-254654888773v
-432267465553v
-```
-In the above example, an ultra crucible would incur the minimum possible heat loss of 94.
-
-Here's another example:
+So, in the above example, the hexadecimal codes can be converted into the true instructions:
 
 ```plaintext
-111111111111
-999999999991
-999999999991
-999999999991
-999999999991
+#70c710 = R 461937
+#0dc571 = D 56407
+#5713f0 = R 356671
+#d2c081 = D 863240
+#59c680 = R 367720
+#411b91 = D 266681
+#8ceee2 = L 577262
+#caa173 = U 829975
+#1b58a2 = L 112010
+#caa171 = D 829975
+#7807d2 = L 491645
+#a77fa3 = U 686074
+#015232 = L 5411
+#7a21e3 = U 500254
 ```
+Digging out this loop and its interior produces a lagoon that can hold an impressive 952408144115 cubic meters of lava.
 
-Sadly, an ultra crucible would need to take an unfortunate path like this one:Sadly, an ultra crucible would need to take an unfortunate path like this one:
-
-```plaintext
-1>>>>>>>1111
-9999999v9991
-9999999v9991
-9999999v9991
-9999999v>>>>
-```
-
-This route causes the ultra crucible to incur the minimum possible heat loss of 71.
-
-Directing the ultra crucible from the lava pool to the machine parts factory, what is the least heat loss it can incur?
+Convert the hexadecimal color codes into the correct instructions; if the Elves follow this new dig plan, how many cubic meters of lava could the lagoon hold?

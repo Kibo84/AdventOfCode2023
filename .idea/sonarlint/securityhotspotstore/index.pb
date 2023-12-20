@@ -88,3 +88,5 @@ j
 :src/main/kotlin/challenges/day18/second/SecondChallenge.kt,2\d\2de5f1e04581e383cfb05877e0e7ed783bcab49b
 h
 8src/main/kotlin/challenges/day16/first/FirstChallenge.kt,b\e\be62ca5554af1e01c8380b0f15b26e39fc221e68
+Z
+*src/main/kotlin/challenges/day18/README.md,1\7\17c769e6fb7ee2585daea2e233785dc79fa351e0
