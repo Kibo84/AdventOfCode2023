@@ -96,3 +96,7 @@ h
 8src/main/kotlin/challenges/day19/first/FirstChallenge.kt,4\6\4673fbaedd31f4f5ebb4d28af760dff4820ad40f
 j
 :src/main/kotlin/challenges/day19/second/SecondChallenge.kt,7\5\7572d69cc3efa4fb57427e47d6acb905be780780
+l
+<src/main/kotlin/challenges/day19/second/SecondAlternative.kt,b\c\bcd3834d9fe019e30344b1a848d9b5717458075f
+Z
+*src/main/kotlin/challenges/day19/README.md,a\8\a83fdf0768c802049b11f916754f695dee0387dd

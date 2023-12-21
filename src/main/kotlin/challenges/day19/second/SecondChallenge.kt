@@ -4,20 +4,17 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
 
-val pieceRangeList = mutableListOf<Piece?>()
-
 fun main() {
-    val file = File("src/inputs/input-testing.txt")
+    val file = File("src/inputs/input-day-19.txt")
     var changeSection = false
     val instructionLinesList = mutableListOf<String>()
-    val piecesLinesList = mutableListOf<String>()
 
     BufferedReader(InputStreamReader(file.inputStream())).use { fileReader ->
         fileReader.readLines().forEach {
             if (it.isEmpty()) {
                 changeSection = true
             } else {
-                if (!changeSection) instructionLinesList.add(it) else piecesLinesList.add(it)
+                if (!changeSection) instructionLinesList.add(it)
             }
         }
     }
@@ -30,10 +27,33 @@ fun main() {
         a = initialRange,
         s = initialRange
     )
-    evaluateNode(firstPiece, Node.nodeMap["in"]!!)
-    val result = pieceRangeList.filterNotNull().map(::println)
+
+    val result = evaluateInstructions(firstPiece, Node.nodeMap["in"]!!.instructions)
 
     println(result)
+}
+
+fun evaluateInstructions(piece: Piece?, instructions: MutableList<Instruction>): Long {
+    piece?.let {
+        val rejected = "R"
+        val accepted = "A"
+        val instruction = instructions.removeFirstOrNull()
+        instruction?.let {
+            val pairPieces = evaluateCondition(piece, instruction)
+            if (instruction.nextNode == rejected) {
+                return 0 + evaluateInstructions(pairPieces.second, instructions)
+            }
+            if (instruction.nextNode == accepted) {
+                return pairPieces.first!!.calculatePossibilities() + evaluateInstructions(pairPieces.second, instructions)
+            }
+            if (instruction.valueCondition == null) {
+                return evaluateInstructions(piece, Node.nodeMap[instruction.nextNode]!!.instructions)
+            }
+            return evaluateInstructions(pairPieces.first, Node.nodeMap[instruction.nextNode]!!.instructions) +
+                    evaluateInstructions(pairPieces.second, instructions)
+        }
+    }
+    return 0
 }
 
 fun evaluateCondition(piece: Piece, instruction: Instruction): Pair<Piece?, Piece?> {
@@ -55,8 +75,8 @@ fun evaluateCondition(piece: Piece, instruction: Instruction): Pair<Piece?, Piec
             rangeTwo = instruction.valueCondition.. range.last
         }
         if (it == greatThan) {
-            rangeOne = instruction.valueCondition!!.. range.last
-            rangeTwo = range.first ..< instruction.valueCondition
+            rangeOne = instruction.valueCondition!! + 1.. range.last
+            rangeTwo = range.first .. instruction.valueCondition
         }
 
         val pieceOne = Piece(
@@ -79,25 +99,7 @@ fun evaluateCondition(piece: Piece, instruction: Instruction): Pair<Piece?, Piec
     return Pair(piece, null)
 }
 
-fun evaluateNode(piece: Piece, node: Node): Piece? {
-    val rejected = "R"
-    val accepted = "A"
-    var tempPiece = piece
-    node.instructions.forEach { instruction ->
-        val pairPieces = evaluateCondition(tempPiece, instruction)
-        when (instruction.nextNode) {
-            rejected -> pieceRangeList.add(null)
-            accepted -> pieceRangeList.add(pairPieces.first)
-            else -> {
-                pairPieces.second?.let { tempPiece = it }
-                evaluateNode(pairPieces.first!!, Node.nodeMap[instruction.nextNode]!!)
-            }
-        }
-    }
-    return null
-}
-
-data class Node(val instructions: List<Instruction>) {
+data class Node(val instructions: MutableList<Instruction>) {
     companion object {
         val nodeMap = mutableMapOf<String, Node>()
 
@@ -129,7 +131,7 @@ data class Node(val instructions: List<Instruction>) {
                     )
                 }
             }
-            nodeMap[stringKey] = Node(instructions = instructionList)
+            nodeMap[stringKey] = Node(instructions = instructionList.toMutableList())
         }
     }
 }
@@ -137,12 +139,7 @@ data class Node(val instructions: List<Instruction>) {
 data class Instruction(val paramToAnalyze: Char?, val condition: Char?, val valueCondition: Int?, val nextNode: String)
 
 data class Piece(val x: IntRange, val m: IntRange, val a: IntRange, val s: IntRange) {
-    fun calculatePosibilities(): Long {
-        val xPossibilities = (x.last - x.first).toLong()
-        val mPossibilities = (m.last - m.first).toLong()
-        val aPossibilities = (a.last - a.first).toLong()
-        val sPossibilities = (s.last - s.first).toLong()
-
-        return xPossibilities * mPossibilities * aPossibilities * sPossibilities
+    fun calculatePossibilities(): Long {
+        return x.count().toLong() * m.count() * a.count() * s.count()
     }
 }
