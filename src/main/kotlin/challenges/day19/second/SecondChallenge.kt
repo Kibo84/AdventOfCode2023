@@ -3,8 +3,9 @@ package challenges.day19.second
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
+import kotlin.math.pow
 
-val pieceRangeList = mutableListOf<Piece?>()
+var totalPossibilities = 0L
 
 fun main() {
     val file = File("src/inputs/input-testing.txt")
@@ -22,79 +23,46 @@ fun main() {
         }
     }
     instructionLinesList.map(Node::fromString)
-    val initialRange = 1 .. 4000
 
-    val firstPiece = Piece(
-        x = initialRange,
-        m = initialRange,
-        a = initialRange,
-        s = initialRange
-    )
-    evaluateNode(firstPiece, Node.nodeMap["in"]!!)
-    val result = pieceRangeList.filterNotNull().map(::println)
+    val initialPossibilities = 4000.0.pow(4).toLong()
+    evaluateNode(initialPossibilities, Node.nodeMap["in"]!!)
 
-    println(result)
+    println(totalPossibilities)
 }
 
-fun evaluateCondition(piece: Piece, instruction: Instruction): Pair<Piece?, Piece?> {
+fun evaluateCondition(possibilities: Long, instruction: Instruction): Long {
     val littleThan = '<'
-    val greatThan = '>'
-    val range = when (instruction.paramToAnalyze) {
-        'x' -> piece.x
-        'm' -> piece.m
-        'a' -> piece.a
-        's' -> piece.s
-        else -> 0..0
-    }
-    var rangeOne: IntRange = 0..0
-    var rangeTwo: IntRange = 0..0
+    var newPossibilities = possibilities
 
     instruction.condition?.let {
-        if (it == littleThan) {
-            rangeOne = range.first ..< instruction.valueCondition!!
-            rangeTwo = instruction.valueCondition.. range.last
-        }
-        if (it == greatThan) {
-            rangeOne = instruction.valueCondition!!.. range.last
-            rangeTwo = range.first ..< instruction.valueCondition
+        val percentage = if (it == littleThan) {
+            (instruction.valueCondition!! - 1).toDouble() / 4000
+        } else {
+            (4000 - instruction.valueCondition!! + 1).toDouble() / 4000
         }
 
-        val pieceOne = Piece(
-            x = if (instruction.paramToAnalyze == 'x') rangeOne else piece.x,
-            m = if (instruction.paramToAnalyze == 'm') rangeOne else piece.m,
-            a = if (instruction.paramToAnalyze == 'a') rangeOne else piece.a,
-            s = if (instruction.paramToAnalyze == 's') rangeOne else piece.s,
-        )
-
-        val pieceTwo = Piece(
-            x = if (instruction.paramToAnalyze == 'x') rangeTwo else piece.x,
-            m = if (instruction.paramToAnalyze == 'm') rangeTwo else piece.m,
-            a = if (instruction.paramToAnalyze == 'a') rangeTwo else piece.a,
-            s = if (instruction.paramToAnalyze == 's') rangeTwo else piece.s,
-        )
-
-        return Pair(pieceOne, pieceTwo)
+        newPossibilities = (possibilities * percentage).toLong()
     }
 
-    return Pair(piece, null)
+    return newPossibilities
 }
 
-fun evaluateNode(piece: Piece, node: Node): Piece? {
+fun evaluateNode(possibilities: Long, node: Node) {
     val rejected = "R"
     val accepted = "A"
-    var tempPiece = piece
+    var tempPossibility = possibilities
     node.instructions.forEach { instruction ->
-        val pairPieces = evaluateCondition(tempPiece, instruction)
+        val newPossibility = evaluateCondition(tempPossibility, instruction)
+        tempPossibility -= newPossibility
         when (instruction.nextNode) {
-            rejected -> pieceRangeList.add(null)
-            accepted -> pieceRangeList.add(pairPieces.first)
+            rejected -> return
+            accepted -> totalPossibilities += newPossibility
             else -> {
-                pairPieces.second?.let { tempPiece = it }
-                evaluateNode(pairPieces.first!!, Node.nodeMap[instruction.nextNode]!!)
+                println("${instruction.nextNode}: $newPossibility")
+                evaluateNode(newPossibility, Node.nodeMap[instruction.nextNode]!!)
             }
         }
     }
-    return null
 }
 
 data class Node(val instructions: List<Instruction>) {
@@ -135,14 +103,3 @@ data class Node(val instructions: List<Instruction>) {
 }
 
 data class Instruction(val paramToAnalyze: Char?, val condition: Char?, val valueCondition: Int?, val nextNode: String)
-
-data class Piece(val x: IntRange, val m: IntRange, val a: IntRange, val s: IntRange) {
-    fun calculatePosibilities(): Long {
-        val xPossibilities = (x.last - x.first).toLong()
-        val mPossibilities = (m.last - m.first).toLong()
-        val aPossibilities = (a.last - a.first).toLong()
-        val sPossibilities = (s.last - s.first).toLong()
-
-        return xPossibilities * mPossibilities * aPossibilities * sPossibilities
-    }
-}
