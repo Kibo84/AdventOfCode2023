@@ -96,3 +96,13 @@ h
 8src/main/kotlin/challenges/day19/first/FirstChallenge.kt,4\6\4673fbaedd31f4f5ebb4d28af760dff4820ad40f
 j
 :src/main/kotlin/challenges/day19/second/SecondChallenge.kt,7\5\7572d69cc3efa4fb57427e47d6acb905be780780
+Z
+*src/main/kotlin/challenges/day19/README.md,a\8\a83fdf0768c802049b11f916754f695dee0387dd
+K
+src/inputs/input-day-20.txt,2\7\27f58b0a6495e56bae5f78e38e3fefac6b8db4cc
+h
+8src/main/kotlin/challenges/day20/first/FirstChallenge.kt,3\a\3aee5424e09b1bcc37b3fac5c568173461e7bcd4
+j
+:src/main/kotlin/challenges/day20/second/SecondChallenge.kt,b\3\b3b714211ee74210e4783aa7943ee202d2782bd5
+Z
+*src/main/kotlin/challenges/day20/README.md,6\4\64dd449aa24d738f08b073563212b45215ddbb62
