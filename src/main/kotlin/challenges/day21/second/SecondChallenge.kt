@@ -11,43 +11,45 @@ enum class Direction(val y: Int, val x: Int) {
     RIGHT(y = 0, x = 1)
 }
 
+const val totalSteps = 26501365
 const val initialPosition = 'S'
 const val firstPosition = 0
 var height = 0
 var width = 0
 
 fun main() {
-    val file = File("src/inputs/input-testing.txt")
+    val file = File("src/inputs/input-day-21.txt")
 
     var garden = BufferedReader(InputStreamReader(file.inputStream())).use { fileReader ->
         fileReader.readLines().map(String::toCharArray)
     }
 
-    val matrixHeight = garden.size - 1
+    val matrixHeight = garden.size
     val centerMatrix = calculateStartPosition(garden).y
 
-    garden = expandGrid(garden, 11)
-    garden.map { it.map(::print); println() }
+    garden = expandGrid(garden, 51)
 
     height = garden.size
     width = garden[firstPosition].size
 
     val startPosition = calculateStartPosition(garden)
 
-    val valueOne = calculatePossiblePositions(startPosition, garden, 6).toLong()
-    val x2 = (centerMatrix + matrixHeight)
-    val valueTwo = calculatePossiblePositions(startPosition, garden, 10).toLong()
-    val x3 = (centerMatrix + (matrixHeight * 2))
-    val valueThree = calculatePossiblePositions(startPosition, garden, 50).toLong()
-    val x4 = (centerMatrix + (matrixHeight * 3))
-    val valueFour = calculatePossiblePositions(startPosition, garden, 100).toLong()
-    val x5 = (centerMatrix + (matrixHeight * 4))
-    val valueFive = calculatePossiblePositions(startPosition, garden, 500).toLong()
-    calculatePossiblePositions(startPosition, garden, 500).toLong()
+    val valueOne = calculatePossiblePositions(startPosition, garden, centerMatrix).toLong()
+    val stepsTwo = (centerMatrix + matrixHeight)
+    val valueTwo = calculatePossiblePositions(startPosition, garden, stepsTwo).toLong()
+    val stepsThree = (centerMatrix + (matrixHeight * 2))
+    val valueThree = calculatePossiblePositions(startPosition, garden, stepsThree).toLong()
+    val stepsFour = (centerMatrix + (matrixHeight * 3))
+    val valueFour = calculatePossiblePositions(startPosition, garden, stepsFour).toLong()
 
+    var knowValues = mutableListOf(valueOne, valueTwo, valueThree, valueFour)
+    val repeats = (totalSteps - stepsThree) / matrixHeight
+    println(repeats)
 
-    var knowValues = listOf(valueOne, valueTwo, valueThree, valueFour, valueFive)
-    repeat(500) { knowValues = calculateNextValueOfSteps(knowValues) }
+    repeat(repeats) {
+        knowValues = calculateNextValueOfSteps(knowValues)
+        knowValues.removeFirst()
+    }
 
     val result = knowValues.last()
 
@@ -66,11 +68,11 @@ fun calculatePossiblePositions(firstPosition: Position, garden: List<CharArray>,
         positions[step + 1] = mutableSetOf()
         beforePositions?.forEach { position ->
             val nextPositions = Direction.entries.map { position.move(it) }
-            positions[step + 1]?.addAll(nextPositions.filter { it.isValidPosition(garden) })
+            val validNextPositions = nextPositions.filter { it.isValidPosition(garden) }
+            positions[step + 1]?.addAll(validNextPositions)
         }
         step++
     }
-    println(positions[step]!!.size)
     return positions[step]!!.size
 }
 
@@ -85,31 +87,35 @@ fun calculateStartPosition(garden: List<CharArray>): Position {
 }
 
 fun expandGrid(original: List<CharArray>, factor: Int): List<CharArray> {
+    val multiplier = if (factor % 2 == 0) factor + 1 else factor
     val rows = original.size
     val cols = original[0].size
     val expanded = List(rows * factor) { CharArray(cols * factor) }
 
-    for (i in 0..< rows * factor) {
-        for (j in 0..< cols * factor) {
+    var count = 0
+
+    for (i in 0..< rows * multiplier) {
+        for (j in 0..< cols * multiplier) {
             expanded[i][j] = original[i % rows][j % cols]
-            if (expanded[i][j] == 'S' && (i % rows != rows / 2 || j % cols != cols / 2)) {
-                expanded[i][j] = '.'
+            if (expanded[i][j] == 'S') {
+                count++
+                if (count != ((multiplier * multiplier) / 2) + 1) {
+                    expanded[i][j] = '.'
+                }
             }
         }
     }
     return expanded
 }
 
-fun calculateNextValueOfSteps(steps: List<Long>): List<Long> {
+fun calculateNextValueOfSteps(steps: MutableList<Long>): MutableList<Long> {
     val firstIndex = 0
     val previousIndexAdjustment = 1
     val calculateLines = mutableListOf<MutableList<Long>>()
     calculateLines.add(steps.toMutableList())
-    println(steps)
 
     while (calculateLines.last().any { it.isNotZero() }) {
         val newLine = generateNextLine(calculateLines.last())
-        println(newLine)
         calculateLines.add(newLine)
     }
 
@@ -119,7 +125,6 @@ fun calculateNextValueOfSteps(steps: List<Long>): List<Long> {
         val previousIndex = index - previousIndexAdjustment
         if (index != firstIndex) {
             val previousLine = newCalculateLines[previousIndex]
-            println(previousLine)
             val lastNumberOfPresentLine = line.last()
             val lastNumberOfPreviousLine = previousLine.last()
             newCalculateLines[index].add(lastNumberOfPresentLine + lastNumberOfPreviousLine)
