@@ -46,7 +46,6 @@ fun calculatePulsationsToSendLowPulseToExit(
     while(!exit) {
         pulsations++
         pileOfPulses.add(Triple("broadcaster", LOW, ""))
-        println(pulsations)
         while (pileOfPulses.isNotEmpty()) {
             val instruction = pileOfPulses.removeFirst()
             if (
@@ -55,7 +54,6 @@ fun calculatePulsationsToSendLowPulseToExit(
                 && instruction.second == HIGH
             ) {
                 mapConditions[instruction.third] = pulsations
-                println(mapConditions)
             }
             if (mapConditions.values.all { it != 0L }) exit = true
             moduleMap[instruction.first]?.receivePulse(instruction.second, instruction.third)
